@@ -59,11 +59,7 @@
 | **שלב 3 (State C)** | 🟢 **ירוק** | 🔴 **אדום** | **10 שניות** | `C` | `10001` | `'1'` (מונה 10 שנ') |
 | **שלב 4 (State D)** | 🟡 **כתום** | 🔴 **אדום** | **2 שניות** | `D` | `10010` | `'0'` (מונה 2 שנ') |
 
-<p align="center">
-  <img src="docs/assets/timing_step_diagram.png" alt="דיאגרמת שלבי רמזור וזמנים" width="70%">
-  <br>
-  <em>תרשים: חלוקת הזמנים ורצף השלבים במחזור הרמזור.</em>
-</p>
+
 
 ---
 
@@ -122,15 +118,14 @@ basys3-traffic-light-controller/
 │   ├── Alternative_Assessment-Traffic_Light.pdf # הוראות המטלה המקוריות
 │   ├── final_report.pdf           # דוח הנדסי מסכם
 │   └── assets/                    # דיאגרמות, תרשימי מצבים וסכמות
-│       ├── system_architecture_block_diagram.png
-│       ├── fsm_state_diagram.png
-│       ├── fsm_truth_table.png
-│       ├── timing_step_diagram.png
-│       ├── sim_waveform_full_cycle.png
-│       ├── sim_waveform_signals_zoom.png
-│       ├── vivado_rtl_schematic.jpg
-│       ├── vivado_device_placed.jpg
-│       └── vivado_timing_utilization.jpg
+│       ├── system_architecture_block_diagram.png # תרשים בלוקים דיגיטלי של ארכיטקטורת המערכת
+│       ├── timebase_waveform_periodic.png        # גלי סימולציה של מחולל הזמן (Timebase 1Hz)
+│       ├── timebase_waveform_zoom.png            # תקריב פולס סיום ספירה של מחלק התדר
+│       ├── sim_waveform_full_cycle.png           # גלי סימולציה של מחזור רמזור שלם (24 שניות)
+│       ├── sim_waveform_signals_zoom.png         # תקריב אותות בקרה וסיום ספירה
+│       ├── vivado_rtl_schematic.jpg              # סכמת RTL מתוך Vivado
+│       ├── vivado_device_placed.jpg              # השמה וניתוב פיזי על גבי שבב ה-Artix-7
+│       └── vivado_timing_utilization.jpg         # דוח תזמון וניצולת משאבים
 │
 ├── reports/                       # דוחות מימוש רשמיים מ-Vivado
 │   ├── TOP_LEVEL_io_placed.rpt
@@ -216,8 +211,15 @@ flowchart TD
 1. **[`TOP_LEVEL.vhd`](src/TOP_LEVEL.vhd) (ישות עליונה):**
    - מחברת את שלושת תת-המודולים באמצעות Port Mapping היררכי.
    - מגדירה את החיבורים הפיזיים לפינים החיצוניים של כרטיס הפיתוח.
-2. **[`TIMEBASE.vhd`](src/TIMEBASE.vhd) (מחלק תדר):**
-   - דוגם את שעון ה-100MHz ומפיק דופק סיום ספירה (`ENABLE`) בקצב של 1Hz.
+2. **[`TIMEBASE.vhd`](src/TIMEBASE.vhd) (מחלק תדר ומחולל זמן בסיס 1Hz):**
+   - **עקרון פעולה:** ממיר את תדר השעון המהיר של המתנד (100MHz, זמן מחזור $10\text{ ns}$) לדופק בודד של Clock Enable סינכרוני בקצב של 1Hz (`ENABLE` / `TC_TB`). שיטה זו מבטיחה סנכרון מלא ללא יצירת ענפי שעון מושהים (Ripple Clocks) או בעיות Clock Skew.
+   - **האצה לסימולציה:** עבור אימות ב-ModelSim, מונה החלוקה מותאם למודולו מקוצר (100ns) המאפשר אימות גלים מהיר ללא הרצת $10^8$ מחזורי שעון.
+
+<p align="center">
+  <img src="docs/assets/timebase_waveform_periodic.png" alt="גלי סימולציה של מחולל הזמן" width="95%">
+  <br>
+  <em>תרשים: גלי סימולציה מתוך ModelSim המציגים הפקת פולס Enable סינכרוני (<code>TC</code>) מחזורי מתוך שעון המערכת.</em>
+</p>
 3. **[`COUNTERS.vhd`](src/COUNTERS.vhd) (מונים מרובבים):**
    - מכיל שני מונים סינכרוניים (מונה 2 שניות ומונה 10 שניות).
    - מנתב את אות סיום הספירה (`NEXT_STAGE`) בהתאם לערך בורר המצבים `SEL`.
@@ -261,11 +263,7 @@ TPL = 10010, SEL = 0
     State_D --> State_A: TC_CNTR = 1
 ```
 
-<p align="center">
-  <img src="docs/assets/fsm_truth_table.png" alt="טבלת אמת של מכונת המצבים" width="75%">
-  <br>
-  <em>תרשים: טבלת אמת מלאה של מצבי ה-FSM והמוצאים.</em>
-</p>
+
 
 ---
 

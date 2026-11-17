@@ -59,11 +59,7 @@ The system cycles through four sequential states endlessly following system rese
 | **Step 3 (State C)** | 🟢 **GREEN** | 🔴 **RED** | **10 seconds** | `C` | `10001` | `'1'` (10s Counter) |
 | **Step 4 (State D)** | 🟡 **YELLOW** | 🔴 **RED** | **2 seconds** | `D` | `10010` | `'0'` (2s Counter) |
 
-<p align="center">
-  <img src="docs/assets/timing_step_diagram.png" alt="Traffic Light Timing Steps" width="70%">
-  <br>
-  <em>Figure: Traffic light 4-step sequence and timing allocation.</em>
-</p>
+
 
 ---
 
@@ -122,15 +118,14 @@ basys3-traffic-light-controller/
 │   ├── Alternative_Assessment-Traffic_Light.pdf # Original lab specification
 │   ├── final_report.pdf           # Comprehensive design report
 │   └── assets/                    # Waveforms, architectural diagrams & schematics
-│       ├── system_architecture_block_diagram.png
-│       ├── fsm_state_diagram.png
-│       ├── fsm_truth_table.png
-│       ├── timing_step_diagram.png
-│       ├── sim_waveform_full_cycle.png
-│       ├── sim_waveform_signals_zoom.png
-│       ├── vivado_rtl_schematic.jpg
-│       ├── vivado_device_placed.jpg
-│       └── vivado_timing_utilization.jpg
+│       ├── system_architecture_block_diagram.png # Digital architecture block diagram
+│       ├── timebase_waveform_periodic.png        # 1 Hz Timebase simulation waveform
+│       ├── timebase_waveform_zoom.png            # Timebase terminal count zoom
+│       ├── sim_waveform_full_cycle.png           # 24-second full cycle ModelSim trace
+│       ├── sim_waveform_signals_zoom.png         # Signal transition detail
+│       ├── vivado_rtl_schematic.jpg              # Elaborated RTL schematic
+│       ├── vivado_device_placed.jpg              # Physical placement on Artix-7 die
+│       └── vivado_timing_utilization.jpg         # Timing summary & resource utilization
 │
 ├── reports/                       # Vivado Implementation Reports
 │   ├── TOP_LEVEL_io_placed.rpt
@@ -216,9 +211,15 @@ Active when SEL = 1"]
 1. **[`TOP_LEVEL.vhd`](src/TOP_LEVEL.vhd) (Structural Top Entity):**
    - Instantiates and connects `TIMEBASE`, `COUNTERS`, and `CONTROL_UNIT`.
    - Exposes top-level ports to external FPGA pins.
-2. **[`TIMEBASE.vhd`](src/TIMEBASE.vhd) (Clock Divider Prescaler):**
-   - Counts master clock pulses to generate a 1 Hz synchronous terminal count pulse (`ENABLE`).
-   - Scales down in simulation for instant verification without running millions of clock cycles.
+2. **[`TIMEBASE.vhd`](src/TIMEBASE.vhd) (1 Hz Clock Divider & Timebase Generator):**
+   - **Theory of Operation:** Converts the high-frequency 100 MHz crystal oscillator ($T_{clk} = 10\text{ ns}$) into a precise 1 Hz single-cycle synchronous enable strobe (`ENABLE` / `TC_TB`). Rather than using a ripple clock that introduces clock-skew, the prescaler acts as a synchronous clock-enable pulse.
+   - **Simulation Speedup:** In simulation mode, the terminal count modulo is scaled to 100 ns ($10$ cycles) allowing rapid verification of multi-second transitions in ModelSim without requiring $10^8$ simulation cycles.
+
+<p align="center">
+  <img src="docs/assets/timebase_waveform_periodic.png" alt="Timebase 1 Hz Clock Enable Waveform" width="95%">
+  <br>
+  <em>Figure: Verified ModelSim waveform demonstrating periodic synchronous clock-enable (<code>TC</code>) pulse generation from the master oscillator.</em>
+</p>
 3. **[`COUNTERS.vhd`](src/COUNTERS.vhd) (Multiplexed Dual Modulo Timers):**
    - Contains a 2-second modulo counter (`Q2`) and a 10-second modulo counter (`Q10`).
    - Multiplexes terminal count pulses (`TC_CNTR`) based on the FSM control line `SEL`.
@@ -262,11 +263,7 @@ TPL = 10010, SEL = 0
     State_D --> State_A: TC_CNTR = 1
 ```
 
-<p align="center">
-  <img src="docs/assets/fsm_truth_table.png" alt="FSM Truth Table" width="75%">
-  <br>
-  <em>Figure: Complete FSM State and Output Truth Table.</em>
-</p>
+
 
 ---
 
