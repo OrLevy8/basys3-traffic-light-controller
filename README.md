@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 <p align="center">
-  <img src="docs/assets/system_architecture_block_diagram.jpg" alt="Traffic Light Controller Architecture Block Diagram" width="95%">
+  <img src="docs/assets/system_architecture_block_diagram.png" alt="Traffic Light Controller Architecture Block Diagram" width="95%">
   <br>
   <em><b>System Architecture Overview:</b> Hierarchical VHDL realization featuring a 1 Hz Timebase prescaler, multiplexed dual-stage Modulo Counters (2s / 10s), and a 4-state Moore Finite State Machine driving vehicle and pedestrian traffic signals.</em>
 </p>
@@ -122,7 +122,7 @@ basys3-traffic-light-controller/
 │   ├── Alternative_Assessment-Traffic_Light.pdf # Original lab specification
 │   ├── final_report.pdf           # Comprehensive design report
 │   └── assets/                    # Waveforms, architectural diagrams & schematics
-│       ├── system_architecture_block_diagram.jpg
+│       ├── system_architecture_block_diagram.png
 │       ├── fsm_state_diagram.png
 │       ├── fsm_truth_table.png
 │       ├── timing_step_diagram.png

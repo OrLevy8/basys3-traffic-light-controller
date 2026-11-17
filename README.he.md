@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 <p align="center">
-  <img src="docs/assets/system_architecture_block_diagram.jpg" alt="תרשים בלוקים של ארכיטקטורת מערכת הרמזור" width="95%">
+  <img src="docs/assets/system_architecture_block_diagram.png" alt="תרשים בלוקים של ארכיטקטורת מערכת הרמזור" width="95%">
   <br>
   <em><b>מבט על של ארכיטקטורת המערכת:</b> מימוש היררכי בשפת VHDL הכולל מחלק תדר 1Hz (Timebase), מונים מודולריים מרובבים (2 ו-10 שניות), ומכונת מצבים מסוג Moore השולטת על רמזורי הרכבים והולכי הרגל.</em>
 </p>
@@ -122,7 +122,7 @@ basys3-traffic-light-controller/
 │   ├── Alternative_Assessment-Traffic_Light.pdf # הוראות המטלה המקוריות
 │   ├── final_report.pdf           # דוח הנדסי מסכם
 │   └── assets/                    # דיאגרמות, תרשימי מצבים וסכמות
-│       ├── system_architecture_block_diagram.jpg
+│       ├── system_architecture_block_diagram.png
 │       ├── fsm_state_diagram.png
 │       ├── fsm_truth_table.png
 │       ├── timing_step_diagram.png
