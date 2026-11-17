@@ -119,6 +119,7 @@ basys3-traffic-light-controller/
 │   ├── final_report.pdf           # Comprehensive design report
 │   └── assets/                    # Waveforms, architectural diagrams & schematics
 │       ├── system_architecture_block_diagram.png # Digital architecture block diagram
+│       ├── fsm_state_transition_diagram.png      # 4-corner visual Moore FSM state transition diagram
 │       ├── timebase_waveform_periodic.png        # 1 Hz Timebase simulation waveform
 │       ├── timebase_waveform_zoom.png            # Timebase terminal count zoom
 │       ├── sim_waveform_full_cycle.png           # 24-second full cycle ModelSim trace
@@ -233,35 +234,22 @@ Active when SEL = 1"]
 
 The core control unit operates as a **Moore Finite State Machine**, where the output lights depend exclusively on the current state:
 
-```mermaid
-stateDiagram-v2
-    [*] --> State_A: Synchronous RESET
-    
-    State_A: State A (10 seconds)
-Cars: RED | Pedestrians: GREEN
-TPL = 01100, SEL = 1
-    State_B: State B (2 seconds)
-Cars: RED + YELLOW | Pedestrians: RED
-TPL = 10110, SEL = 0
-    State_C: State C (10 seconds)
-Cars: GREEN | Pedestrians: RED
-TPL = 10001, SEL = 1
-    State_D: State D (2 seconds)
-Cars: YELLOW | Pedestrians: RED
-TPL = 10010, SEL = 0
+<p align="center">
+  <img src="docs/assets/fsm_state_transition_diagram.png" alt="Control Unit Moore FSM State Transition Diagram" width="95%">
+</p>
 
-    State_A --> State_A: TC_CNTR = 0
-    State_A --> State_B: TC_CNTR = 1
-    
-    State_B --> State_B: TC_CNTR = 0
-    State_B --> State_C: TC_CNTR = 1
-    
-    State_C --> State_C: TC_CNTR = 0
-    State_C --> State_D: TC_CNTR = 1
-    
-    State_D --> State_D: TC_CNTR = 0
-    State_D --> State_A: TC_CNTR = 1
-```
+### 📋 State & Output Truth Table
+
+| State | Phase Description | Duration | Vehicle Lights | Pedestrian Lights | Output Vector `TPL[4:0]` | Counter Select `SEL` |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+| **A** | Pedestrian Crossing Phase | **10 seconds** | 🔴 RED | 🟢 GREEN | `"01100"` | `'1'` (10s Counter) |
+| **B** | Vehicle Preparation Phase | **2 seconds** | 🔴 RED + 🟡 YELLOW | 🔴 RED | `"10110"` | `'0'` (2s Counter) |
+| **C** | Vehicle Green Flow Phase | **10 seconds** | 🟢 GREEN | 🔴 RED | `"10001"` | `'1'` (10s Counter) |
+| **D** | Vehicle Yellow Warning Phase | **2 seconds** | 🟡 YELLOW | 🔴 RED | `"10010"` | `'0'` (2s Counter) |
+
+* **Total Cycle Duration:** 24 seconds (10s + 2s + 10s + 2s).
+* **Synchronous Reset:** Active-high push button `btnC` resets the FSM to **State A** with `TPL <= "01100"` and `SEL <= '1'`.
+* **Transition Logic:** If `TC_CNTR = '0'`, the controller remains in the current state (`Hold`). When `TC_CNTR = '1'`, it advances to the next phase in the cyclic ring (A → B → C → D → A).
 
 
 
